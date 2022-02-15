@@ -8,6 +8,7 @@ using AgileManagement.Mvc.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -114,15 +115,18 @@ namespace AgileManagement.Mvc.Areas.Admin.Controllers
         [HttpPost]
         public JsonResult AddSprintRequest([FromBody] SprintAddInputModel model)
         {
-            var sprint = _projectRepository.Find(model.ProjectId);
-
-            foreach (var item in model.ProjectId)
-            {
-               // sprint.AddSprint(new Sprint(item));
-            }
+            var project = _projectRepository.GetQuery().Include(x => x.Sprints).Where(c => c.Id == model.ProjectId).FirstOrDefault();
+            project.AddSprint(new Sprint(model.StartDate, model.EndDate));
             _projectRepository.Save();
-            return Json("OK");
+            var lastSprint = project.Sprints.OrderByDescending(x => x.EndDate).FirstOrDefault();
+            return Json(new {lastSprint});
         }
+        //[HttpGet]
+        //public IActionResult ListSprintRequest(string projectId)
+        //{
+        //    var response = _sprintService.OnProcess;
+        //    return View(response);
+        //}
         [HttpPost]
         public JsonResult AddContributorRequest([FromBody] ContributorInputModel model)
         {
@@ -140,6 +144,16 @@ namespace AgileManagement.Mvc.Areas.Admin.Controllers
 
         }
 
+//         try
+//            {
+//                var project = _projectRepository.GetQuery().Include(x => x.Sprints).Where(c => c.Id == model.ProjectId).FirstOrDefault();
+//        project.AddSprint(new Sprint(model.StartDate, model.EndDate));
+//                return Json(new { isSuccess = true, message = "ok" });
+//            }
+//            catch (Exception ex)
+//{
+//    return Json(new { isSuccess = false, message = ex.Message });
+//}
        
     }
 }

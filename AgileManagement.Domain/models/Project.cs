@@ -84,8 +84,8 @@ namespace AgileManagement.Domain
 
         public void AddSprint(Sprint sprint)
         {
-
-           // sprints.Add(sprint);
+            sprint.SetSprintName(sprints.Count());
+            sprints.Add(sprint);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace AgileManagement.Domain.models
     public class Sprint:Entity
     {
         public string Name { get;private set; } = "Sprint-";
-        public int SiraNo { get; private set; }
+        public bool IsActive { get; private set; }
         public DateTime StartDate { get;private set; }
         public DateTime EndDate { get;private set; }
         public Project Project { get; private set; }
@@ -21,14 +21,14 @@ namespace AgileManagement.Domain.models
             SetDate(startDate, endDate);
         }
 
-        public void SetSiraNo(int siraNo)
-        {
-            if (siraNo<=0)
-            {
-                throw new Exception("Sprint sıra no 0 dan büyük olmalıdır.");
-            }
-            SiraNo = siraNo;
-        }
+        //public void SetSiraNo(int siraNo)
+        //{
+        //    if (siraNo<=0)
+        //    {
+        //        throw new Exception("Sprint sıra no 0 dan büyük olmalıdır.");
+        //    }
+        //    SiraNo = siraNo;
+        //}
         public void SetDate(DateTime startDate, DateTime endDate)
         {
             if (startDate>endDate)
@@ -46,6 +46,9 @@ namespace AgileManagement.Domain.models
             StartDate = startDate;
             EndDate = endDate;
         }
-
+        public void SetSprintName(int count)
+        {
+           this.Name="Sprint - "+count.ToString();
+        }
     }
 }

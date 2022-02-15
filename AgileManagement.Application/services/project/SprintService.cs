@@ -18,17 +18,16 @@ namespace AgileManagement.Application.service
             _projectRepository = projectRepository;
         }
 
-        public SprintResponseDto OnProcess(SprintRequestDto request)//sprintresponsedto??????????
+        public SprintResponseDto OnProcess(SprintRequestDto request)
         {
-            var projectSprint = _projectRepository.GetQuery().Include(x => x.Sprints).Where(y => y.Id == request.ProjectId).Select(a => new ProjectDto
+            var projectSprint = _projectRepository.GetQuery().Include(x => x.Sprints).Where(y => y.Id == request.ProjectId).Select(a => new ProjectSprintDto
             {
                 ProjectId = a.Id,
                 Name = a.Name,
                 Description = a.Description,
-                Sprints = a.Sprints.Select(z => new
+                Sprints = a.Sprints.OrderBy(b=>b.Name).Select(z => new
                 SprintDto
                 {
-                    SiraNo = z.SiraNo,
                     StartDate = z.StartDate,
                     EndDate = z.EndDate,
                     Name = z.Project.Name
@@ -38,7 +37,7 @@ namespace AgileManagement.Application.service
 
             var response = new SprintResponseDto
             {
-                ProjectDto = projectSprint
+                ProjectSprintDto = projectSprint
             };
 
             return response;
