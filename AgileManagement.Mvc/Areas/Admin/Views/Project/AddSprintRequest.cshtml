@@ -10,10 +10,10 @@
 
 @model AgileManagement.Application.SprintResponseDto
 
+@foreach (var sprint in Model.ProjectSprintDto.Sprints)
+{
+    <div class="accordion" id="accordion">
 
-<div class="accordion" id="accordion">
-    @foreach (var sprint in Model.ProjectSprintDto.Sprints)
-    {
         <div class="card">
             <div class="card-header" id="headingOne">
                 <h2 class="mb-0">
@@ -25,101 +25,100 @@
             <div id="collapse-@sprint.Name" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
                 <div class="card-body">
                     Some placeholder content for the first accordion panel. This panel is shown by default, thanks to the <code>.show</code> class.
+
                 </div>
             </div>
         </div>
-    }
+      
 
-</div>
+    </div>
+}
 
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addSprint">
+        Add Sprint
+    </button>
 
-
-<button onclick="AddSprint()" type="button" class="btn btn-primary" data-toggle="modal" data-target="#addSprint">
-    Add Sprint
-</button>
-
-<div class="modal fade" id="addSprint" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add Sprint</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div id="form-sprint-add" class="modal-body">
-                <div class="input-group mb-3">
-                    <input type="date" id="sDate" class="form-control">
-                    <input type="date" id="eDate" class="form-control">
+    <div class="modal fade" id="addSprint" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Sprint</h5>
+                    <span>@Model.ProjectSprintDto.Name</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <div id="form-sprint-add" class="modal-body">
+                    <form action="AddSprintRequest" method="post">
+                        <div class="form-group mb-3">
+                            <input type="date" id="sDate" class="form-control">
+                            <input type="date" id="eDate" class="form-control">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 
-                <button type="submit" id="btnSave" class="btn btn-primary" onclick="SendSprint()">Add</button>
+                    <button type="submit" id="btnSave" class="btn btn-primary" data-save="modal" onclick="SendSprint('@Model.ProjectSprintDto.ProjectId')">Add</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
-    <script>
+    @section Scripts {
+        <script>
 
+            function SendSprint(projectId) {
+                console.log(projectId);
+                const startDate = $('#sDate').val();
+                const endDate = $('#eDate').val();
+                console.log(startDate)
+                console.log("enddate", endDate)
+                let sprint = {
+                    startDate,
+                    endDate,
+                    projectId
+                };
+                $.ajax({
+                    method: 'Post',
+                    url: '/Admin/Project/AddSprintRequest',
+                    contentType: 'application/json',
+                    data: JSON.stringify(sprint),
+                    success: (response) => {
+                        console.log("response başarılı");
+                        if (response.isSuccess) {
+                            AddSprintSuccess(response.lastSprint);
+                        }
+                        else {
+                            console.log(response.message);
 
-        function SendSprint(projectId) {
-
-            console.log('projectId', projectId);
-            console.log('sprint', sprints);
-           
-
-            const sDate = $("#sDate").val();
-            const eDate = $("#eDate").val();
-            console.log(sDate);
-            console.log(eDate);
-
-            const sprint = {
-                sDate,
-                eDate,
-                projectId
-            };
-
-
-            $.ajax({
-                method: 'Post',
-                url: '/Admin/Project/AddSprintRequest',
-                contentType: 'application/json',
-                data: JSON.stringify(sprint),
-                success: (response) => {
-                    alert('Başarılı')
-                    SendSprintSuccess(response.lastSprint);
-                },
-                error: (error) => {
-                    console.log('error', error);
-                }
-            })
-            
+                        }
+                    },
+                    error: (error) => {
+                        console.log("response başarısız")
+                        alert(error);
+                    }
+                })
             }
-        }
-        function SendSprintSuccess(sprint) {
-            $('#accordion').append(`<div class="card">
-                    <div class="card-header" id="headingOne">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link" data-toggle="collapse" data-target="#${sprint.name}" aria-expanded="true" aria-controls="collapseOne">
-                                ${sprint.name}
-                            </button>
-                        </h5>
-                    </div>
+            function AddSprintSuccess(sprint) {
+                console.log(typeof (sprint.endDate))
+                console.log(sprint)
+                $('#accordion').append(`<div class="card">
+                                <div class="card-header" id="headingOne">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" data-toggle="collapse" data-target="#${sprint.sprintName}" aria-expanded="true" aria-controls="collapseOne">
+                                            ${sprint.sprintName.slice(0, 10).split("-").reverse().join("-")}   ${sprint.StardDate.slice(0, 10).split("-").reverse().join("-")} - ${sprint.EndDate.slice(0, 10).split("-").reverse().join("-")}
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="${sprint.sprintName}" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                    <div class="card-body">
+                                        Geliştirme aşamasında...
+                                     /*   <button id= class="btn btn-danger">sil</button>*/
+                                    </div>
+                                </div>
+                            </div>`);
+            }
 
-                    <div id="${name}" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                        <div class="card-body">
-                            <p> ${sprint.StartDate.slice(0, 10).split("-").reverse().join("-")} / ${sprint.EndDate.slice(0, 10).split("-").reverse().join("-")}</p>
-                        </div>
-                    </div>
-                </div>`);
-        }
-      
-        
-
-
-    </script>
-}
+        </script>
+    }

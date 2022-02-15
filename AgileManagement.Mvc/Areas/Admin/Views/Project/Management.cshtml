@@ -24,8 +24,8 @@
             <td>@item.Name</td>
             <td>@item.Description</td>
             <td>@string.Join(',', item.Contributors.Select(a => a.Email))</td>
-            <td><a asp-area="Admin" asp-controller="Project" asp-action="AddContributorRequest" asp-route-projectId="@item.ProjectId">Add Contributor to Project</a></td>
-            <td><a asp-area="Admin" asp-controller="Project" asp-action="AddSprintRequest" asp-route-projectId="@item.ProjectId">Add Sprint to Project</a></td>
+            <td><a class="btn btn-outline-dark" asp-area="Admin" asp-controller="Project" asp-action="AddContributorRequest" asp-route-projectId="@item.ProjectId">Add Contributor</a>
+            <a class="btn btn-outline-dark"  asp-area="Admin" asp-controller="Project" asp-action="AddSprintRequest" asp-route-projectId="@item.ProjectId">Add Sprint</a></td>
             
         </tr>}
         </table>
